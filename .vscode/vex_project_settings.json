@@ -1,0 +1,19 @@
+{
+	"extension": {
+		"version": "0.6.1",
+		"json": 2
+	},
+	"project": {
+		"name": "blue_Negative",
+		"description": "",
+		"creationDate": "1/25/2025, 9:08:38 AM",
+		"platform": "V5",
+		"language": "cpp",
+		"slot": 7,
+		"sdkVersion": "V5_20240802_15_00_00",
+		"cpp": {
+			"includePath": [],
+			"printf_float": true
+		}
+	}
+}
