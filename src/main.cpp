@@ -81,35 +81,39 @@ class autoClamper{
     }
 
   
-  static void AutoClamping(){
-    double lDist = clampLeft.objectDistance(distanceUnits::mm);
-    double rDist = clampRight.objectDistance(distanceUnits::mm);
-    double dist = (lDist + rDist)/2;
-    double hue = clamper.hue();
-    
-    //printf("auto clamp intitated");
-    printf("right distance: %f", rDist);
-    printf(" left distance: %f \n", lDist);
-    printf("hue: %f \n", hue);
+  static task AutoClamping(){
+    while(true){
+      double lDist = clampLeft.objectDistance(distanceUnits::mm);
+      double rDist = clampRight.objectDistance(distanceUnits::mm);
+      double dist = (lDist + rDist)/2;
+      double hue = clamper.hue();
+      
+      //printf("auto clamp intitated");
+      printf("right distance: %f", rDist);
+      printf(" left distance: %f \n", lDist);
+      printf("hue: %f \n", hue);
 
-    if(stopClamp == true){
-      mogoClamp.set(false);
-    } else if(stopClamp == false){
-      while(hue > 50 && hue < 68 && dist <= 50 && (lDist <= 44 && rDist <= 44)){
-        
-          mogoClamp.set(true);
-          printf("right distance: %f", rDist);
-          printf(" left distance: %f \n", lDist);
-          printf("hue: %f \n", hue);
-          wait(10, timeUnits::msec);
+      if(stopClamp == true){
+        mogoClamp.set(false);
+      } else if(stopClamp == false){
+        if(hue > 50 && hue < 68 && dist <= 50 && (lDist <= 44 && rDist <= 44)){
+          
+            mogoClamp.set(true);
+            printf("right distance: %f", rDist);
+            printf(" left distance: %f \n", lDist);
+            printf("hue: %f \n", hue);
+            
 
-        break;
-      } 
-    } else {
-      mogoClamp.set(false);
+          
+        } 
+      } else {
+        mogoClamp.set(false);
+      }
+      wait(10, timeUnits::msec);
     }
+    
+    return 0;
   }
-
 };
 
 class PID{
@@ -141,7 +145,7 @@ class PID{
      inertVal=inert.rotation(degrees);
      error=target-inertVal;
      while(fabs(error)>0.1){
-        autoClamper::AutoClamping();
+      
        inertVal=inert.rotation(degrees);
        error=target-inertVal;
        integral=integral+error;
@@ -176,7 +180,7 @@ class PID{
      errorR=target-motorEncoderRight;
      error=(errorL+errorR)/2;
      while(fabs(error)>0.1){
-      autoClamper::AutoClamping();
+      
        motorEncoderLeft=fLMotor.position(degrees)*(2.75*M_PI)/360;
        motorEncoderRight=fRMotor.position(degrees)*(2.75*M_PI)/360;
        errorL=target-motorEncoderLeft;
@@ -393,6 +397,8 @@ void pre_auton(void) {
   colorSort.setLight(ledState::on);
   colorSort.setLightPower(100, percent);
 
+  task controlTask(autoClamper::AutoClamping());
+
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -435,7 +441,7 @@ void autonomous(void){
   drive.resetPosition();
   intake.resetPosition();
   while(true){
-    autoClamper::AutoClamping();
+    //autoClamper::AutoClamping();
     //EXPERIEMENTAL AUTON WITH AI-BASED PID
     // if(slotter == 0){
       
@@ -446,7 +452,7 @@ void autonomous(void){
         moving.moveTo(-20);
         wait(200, msec);
         moving.moveTo(-10);
-        
+        //autoClamper::AutoClamping();
         //mogoClamp.set(true);
 
         wait(300,msec);
@@ -600,7 +606,7 @@ void usercontrol(void) {
     Controller.ButtonL2.released(intakeStop); // used to be DOWN
     //clamp code
     //used to be L2
-    autoClamper::AutoClamping();
+    //autoClamper::AutoClamping();
     if(Controller.ButtonR2.pressing()){
       autoClamper::stopAutoClamping();
     } else {
